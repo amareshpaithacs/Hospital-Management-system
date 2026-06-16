@@ -15,6 +15,7 @@ A frontend-focused Hospital Management System built using React and Bootstrap. T
 - React Router DOM
 - Bootstrap 5
 - React Icons
+- React Recharts
 
 **Development Tools:**
 - Vite
