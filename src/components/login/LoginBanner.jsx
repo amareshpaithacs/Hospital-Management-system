@@ -9,21 +9,17 @@ function LoginBanner() {
             <BsActivity className="brand-logo-icon" />
           </div>
         </div>
-
         <div className="brand-text">
           <span className="brand-name">MediCare HIS</span>
           <span className="brand-subtitle">Hospital Information System</span>
         </div>
       </div>
-
       <h2 className="banner-heading">Enterprise Healthcare Management</h2>
-
       <p className="banner-description">
         Complete hospital operations platform with role-based access control,
         real-time operations, AI-assisted workflows, and comprehensive patient
         care management.
       </p>
-
       <div className="banner-features">
         <div className="feature-card">
           <span className="feature-title feature-title-blue">Multi-Branch</span>

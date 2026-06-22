@@ -1,18 +1,15 @@
 import { useEffect } from "react";
 import { BsX } from "react-icons/bs";
 
-const Modal = ({ isOpen, onClose, title, children, footer }) => {
+function Modal({ isOpen, onClose, title, children, footer }) {
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
-    
-    // Cleanup function to reset overflow when modal unmounts
     return () => {
       document.body.style.overflow = "";
     };
   }, [isOpen]);
 
   if (!isOpen) return null;
-
   return (
     <>
       <div className="modal-backdrop" onClick={onClose} />
@@ -24,11 +21,9 @@ const Modal = ({ isOpen, onClose, title, children, footer }) => {
               <BsX size={20} />
             </button>
           </div>
-          
           <div className="modal-body">
             {children}
           </div>
-          
           {footer && (
             <div className="modal-footer">
               {footer}
@@ -38,6 +33,6 @@ const Modal = ({ isOpen, onClose, title, children, footer }) => {
       </div>
     </>
   );
-};
+}
 
 export default Modal;

@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 
-const roles = [
+const HOSPITAL_ROLES = [
   "Administrator",
   "Receptionist",
   "Doctor",
@@ -13,22 +13,22 @@ const roles = [
   "Inventory Manager",
 ];
 
-function RoleSelector({ selectedRole, onRoleSelect }) {
+function RoleSelector({ selectedRole, onRoleSelect, errorMessage }) {
   return (
     <div className="role-section">
       <span className="role-section-label">Login as:</span>
       <div className="role-grid">
-        {roles.map((role) => (
+        {HOSPITAL_ROLES.map((role) => (
           <button
             key={role}
             type="button"
             className={`role-btn${selectedRole === role ? " active" : ""}`}
-            onClick={() => onRoleSelect(role)}
-          >
+            onClick={() => onRoleSelect(role)}>
             {role}
           </button>
         ))}
       </div>
+      {errorMessage && <p className="error-msg">{errorMessage}</p>}
     </div>
   );
 }
@@ -36,6 +36,7 @@ function RoleSelector({ selectedRole, onRoleSelect }) {
 RoleSelector.propTypes = {
   selectedRole: PropTypes.string.isRequired,
   onRoleSelect: PropTypes.func.isRequired,
+  errorMessage: PropTypes.string,
 };
 
 export default RoleSelector;

@@ -31,11 +31,9 @@ function Placeholder({
       </div>
     </div>
   );
-
   if (useAdminLayout || user?.role === "Administrator") {
     return <AdminLayout>{content}</AdminLayout>;
   }
-
   return content;
 }
 

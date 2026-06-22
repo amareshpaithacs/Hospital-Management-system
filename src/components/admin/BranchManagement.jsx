@@ -38,8 +38,7 @@ function BranchManagementContent() {
   const [modalMode, setModalMode] = useState("add");
   const [editingBranchId, setEditingBranchId] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
-  const [nameError, setNameError] = useState("");
-  const [addressError, setAddressError] = useState("");
+  const [errors, setErrors] = useState({});
 
   const totalBranchCount = branches.length;
   const totalBedsCount = branches.reduce((sum, b) => sum + b.totalBeds, 0);
@@ -48,49 +47,33 @@ function BranchManagementContent() {
   const occupancyRate = totalBedsCount > 0
     ? Math.round((occupiedBeds / totalBedsCount) * 100)
     : 0;
+  const NETWORK_STATS = [
+    { label: "Total Branches", value: totalBranchCount, colorClass: "bm-ns-blue" },
+    { label: "Total Beds", value: totalBedsCount, colorClass: "bm-ns-green" },
+    { label: "Total Staff", value: totalStaffCount, colorClass: "bm-ns-purple" },
+    { label: "Occupied Beds", value: occupiedBeds, colorClass: "bm-ns-orange" },
+    { label: "Occupancy Rate", value: `${occupancyRate}%`, colorClass: "bm-ns-peach" },
+  ];
 
-  const openAddModal = () => {
-    setModalMode("add");
-    setEditingBranchId(null);
-    setForm(EMPTY_FORM);
-    setNameError("");
-    setAddressError("");
-    setShowModal(true);
-  };
-
-  const openEditModal = (branch) => {
-    setModalMode("edit");
-    setEditingBranchId(branch.id);
-    setForm({
+  const openModal = (mode, branch = null) => {
+    setModalMode(mode);
+    setEditingBranchId(branch ? branch.id : null);
+    setForm(branch ? {
       branchName: branch.name,
       locationAddress: branch.address,
       totalBedCapacity: String(branch.totalBeds),
       staffCount: String(branch.staff),
       departments: branch.departments || [],
       resources: branch.resources || [],
-    });
-    setNameError("");
-    setAddressError("");
+    } : EMPTY_FORM);
+    setErrors({});
     setShowModal(true);
   };
 
-  const openViewModal = (branch) => {
-    setModalMode("view");
-    setEditingBranchId(branch.id);
-    setForm({
-      branchName: branch.name,
-      locationAddress: branch.address,
-      totalBedCapacity: String(branch.totalBeds),
-      staffCount: String(branch.staff),
-      departments: branch.departments || [],
-      resources: branch.resources || [],
-    });
-    setNameError("");
-    setAddressError("");
-    setShowModal(true);
+  const closeModal = () => {
+    setShowModal(false);
+    setErrors({});
   };
-
-  const closeModal = () => setShowModal(false);
 
   const toggleListItem = (field, value) => {
     if (modalMode === "view") return;
@@ -103,23 +86,15 @@ function BranchManagementContent() {
   };
 
   const handleSaveBranch = () => {
-    const errs = [];
-    if (!form.branchName) {
-      setNameError("Branch name is required");
-      errs.push("name");
-    } else {
-      setNameError("");
+    const validationErrors = {};
+    if (!form.branchName) validationErrors.branchName = "Branch name is required";
+    if (!form.locationAddress) validationErrors.locationAddress = "Location address is required";
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
     }
-
-    if (!form.locationAddress) {
-      setAddressError("Location address is required");
-      errs.push("address");
-    } else {
-      setAddressError("");
-    }
-
-    if (errs.length > 0) return;
-
+    setErrors({});
     let updated;
     if (modalMode === "add") {
       const newBranch = {
@@ -151,14 +126,12 @@ function BranchManagementContent() {
         return b;
       });
     }
-
     setBranches(updated);
     saveBranches(updated);
     closeModal();
   };
 
   const isViewMode = modalMode === "view";
-
   const getModalTitle = () => {
     if (modalMode === "add") return "Add New Branch";
     if (modalMode === "edit") return "Branch Settings";
@@ -172,7 +145,9 @@ function BranchManagementContent() {
 
   const getStatusBadgeClass = (status) => STATUS_CLASS_MAP[status] ?? "status-pill-inactive";
   const getStatusLabel = (status) => STATUS_LABEL_MAP[status] ?? "inactive";
-
+  const getInputClass = (fieldName) => {
+    return `form-input${errors[fieldName] ? " input-error" : ""}`;
+  };
   return (
     <div className="container-fluid py-3 admin-content-container">
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -180,12 +155,11 @@ function BranchManagementContent() {
           <h2 className="page-title">Branch Management</h2>
           <p className="page-subtitle">Manage multi-branch hospital operations</p>
         </div>
-        <button className="bm-btn-add" onClick={openAddModal}>
+        <button className="bm-btn-add" onClick={() => openModal("add")}>
           <BsPlus size={18} />
           Add New Branch
         </button>
       </div>
-
       <div className="bm-grid mb-4">
         {branches.map((branch) => (
           <div key={branch.id} className="bm-card">
@@ -203,12 +177,10 @@ function BranchManagementContent() {
                 {getStatusLabel(branch.status)}
               </span>
             </div>
-
             <div className="bm-address-row">
               <BsGeoAlt size={14} className="bm-address-icon" />
               <span className="bm-address-text">{branch.address}</span>
             </div>
-
             <div className="bm-stats-row">
               <div className="bm-stat">
                 <span className="bm-stat-label">Total Beds</span>
@@ -223,46 +195,29 @@ function BranchManagementContent() {
                 <span className="bm-stat-value">{branch.patients}</span>
               </div>
             </div>
-
             <div className="bm-card-footer">
-              <button className="bm-btn-view-details" onClick={() => openViewModal(branch)}>
+              <button className="bm-btn-view-details" onClick={() => openModal("view", branch)}>
                 <BsEye size={14} />
                 View Details
               </button>
-              <button className="bm-btn-settings" title="Branch settings" onClick={() => openEditModal(branch)}>
+              <button className="bm-btn-settings" title="Branch settings" onClick={() => openModal("edit", branch)}>
                 <BsGear size={16} />
               </button>
             </div>
           </div>
         ))}
       </div>
-
       <div className="bm-network-card">
         <h6 className="bm-network-title">Network Overview</h6>
         <div className="bm-network-stats">
-          <div className="bm-network-stat bm-ns-blue">
-            <span className="bm-network-label">Total Branches</span>
-            <span className="bm-network-value">{totalBranchCount}</span>
-          </div>
-          <div className="bm-network-stat bm-ns-green">
-            <span className="bm-network-label">Total Beds</span>
-            <span className="bm-network-value">{totalBedsCount}</span>
-          </div>
-          <div className="bm-network-stat bm-ns-purple">
-            <span className="bm-network-label">Total Staff</span>
-            <span className="bm-network-value">{totalStaffCount}</span>
-          </div>
-          <div className="bm-network-stat bm-ns-orange">
-            <span className="bm-network-label">Occupied Beds</span>
-            <span className="bm-network-value">{occupiedBeds}</span>
-          </div>
-          <div className="bm-network-stat bm-ns-peach">
-            <span className="bm-network-label">Occupancy Rate</span>
-            <span className="bm-network-value">{occupancyRate}%</span>
-          </div>
+          {NETWORK_STATS.map(({ label, value, colorClass }) => (
+            <div key={label} className={`bm-network-stat ${colorClass}`}>
+              <span className="bm-network-label">{label}</span>
+              <span className="bm-network-value">{value}</span>
+            </div>
+          ))}
         </div>
       </div>
-
       <Modal
         isOpen={showModal}
         onClose={closeModal}
@@ -281,39 +236,33 @@ function BranchManagementContent() {
                 Cancel
               </button>
             </>
-          )
-        }
-      >
+          )}>
         <div className="field-group">
                   <label className="field-group-label">
                     Branch Name <span className="required-mark">*</span>
                   </label>
                   <input
                     type="text"
-                    className={`form-input${nameError ? " input-error" : ""}`}
+                    className={getInputClass("branchName")}
                     placeholder="North Medical Center"
                     value={form.branchName}
                     onChange={(e) => setForm((p) => ({ ...p, branchName: e.target.value }))}
-                    disabled={isViewMode}
-                  />
-                  {nameError && <span className="error-hint">{nameError}</span>}
+                    disabled={isViewMode} />
+                  {errors.branchName && <span className="error-hint">{errors.branchName}</span>}
                 </div>
-
                 <div className="field-group">
                   <label className="field-group-label">
                     Location Address <span className="required-mark">*</span>
                   </label>
                   <input
                     type="text"
-                    className={`form-input${addressError ? " input-error" : ""}`}
+                    className={getInputClass("locationAddress")}
                     placeholder="123 Healthcare Ave, City"
                     value={form.locationAddress}
                     onChange={(e) => setForm((p) => ({ ...p, locationAddress: e.target.value }))}
-                    disabled={isViewMode}
-                  />
-                  {addressError && <span className="error-hint">{addressError}</span>}
+                    disabled={isViewMode}/>
+                  {errors.locationAddress && <span className="error-hint">{errors.locationAddress}</span>}
                 </div>
-
                 <div className="two-col-grid">
                   <div className="field-group">
                     <label className="field-group-label">
@@ -324,8 +273,7 @@ function BranchManagementContent() {
                       className="form-input"
                       value={form.totalBedCapacity}
                       onChange={(e) => setForm((p) => ({ ...p, totalBedCapacity: e.target.value }))}
-                      disabled={isViewMode}
-                    />
+                      disabled={isViewMode}/>
                   </div>
                   <div className="field-group">
                     <label className="field-group-label">
@@ -336,11 +284,9 @@ function BranchManagementContent() {
                       className="form-input"
                       value={form.staffCount}
                       onChange={(e) => setForm((p) => ({ ...p, staffCount: e.target.value }))}
-                      disabled={isViewMode}
-                    />
+                      disabled={isViewMode}/>
                   </div>
                 </div>
-
                 <div className="field-group">
                   <label className="field-group-label">Departments</label>
                   <div className="bm-section-box">
@@ -352,15 +298,13 @@ function BranchManagementContent() {
                             className="check-input"
                             checked={form.departments.includes(item)}
                             onChange={() => toggleListItem("departments", item)}
-                            disabled={isViewMode}
-                          />
+                            disabled={isViewMode}/>
                           {item}
                         </label>
                       ))}
                     </div>
                   </div>
                 </div>
-
                 <div className="field-group">
                   <label className="field-group-label">Available Resources</label>
                   <div className="bm-section-box">
@@ -372,14 +316,13 @@ function BranchManagementContent() {
                             className="check-input"
                             checked={form.resources.includes(item)}
                             onChange={() => toggleListItem("resources", item)}
-                            disabled={isViewMode}
-                          />
-                          {item}
-                        </label>
-                      ))}
-                    </div>
-                  </div>
+                            disabled={isViewMode}/>
+                        {item}
+                      </label>
+                    ))}
                 </div>
+            </div>
+        </div>
       </Modal>
     </div>
   );

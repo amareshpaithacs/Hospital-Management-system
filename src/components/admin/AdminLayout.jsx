@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 
@@ -12,24 +13,32 @@ function AdminLayout({ children }) {
       setIsMobile(mobile);
       setIsSidebarOpen(!mobile);
     };
-
     checkViewport();
     window.addEventListener("resize", checkViewport);
     return () => window.removeEventListener("resize", checkViewport);
   }, []);
 
+  const handleCloseSidebar = () => {
+    setIsSidebarOpen(false);
+  };
+  const handleOpenSidebar = () => {
+    setIsSidebarOpen(true);
+  };
   return (
     <div className="admin-layout">
       {isSidebarOpen && isMobile && (
-        <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)} />
+        <div className="sidebar-overlay" onClick={handleCloseSidebar} />
       )}
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <Sidebar isOpen={isSidebarOpen} onClose={handleCloseSidebar} />
       <div className="admin-main">
-        <Header onMenuClick={() => setIsSidebarOpen(true)} isSidebarOpen={isSidebarOpen} />
+        <Header onMenuClick={handleOpenSidebar} isSidebarOpen={isSidebarOpen} />
         <main className="admin-content">{children}</main>
       </div>
     </div>
   );
 }
+AdminLayout.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 
 export default AdminLayout;

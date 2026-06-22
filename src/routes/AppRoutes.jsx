@@ -4,7 +4,26 @@ import AdminDashboard from "../pages/AdminDashboard.jsx";
 import UserManagement from "../pages/UserManagement.jsx";
 import BranchManagement from "../pages/BranchManagement.jsx";
 import Placeholder from "../pages/Placeholder.jsx";
+import NotFound from "../pages/NotFound.jsx";
 import ProtectedRoute from "../config-service/ProtectedRoute.jsx";
+
+const adminPlaceholderRoutes = [
+  {
+    path: "/admin/analytics",
+    title: "Analytics Dashboard",
+    description: "This module is currently under development and will be available in an upcoming release."
+  },
+  {
+    path: "/admin/audit",
+    title: "Audit Logs",
+    description: "Administrative activity tracking will be available in an upcoming release."
+  },
+  {
+    path: "/admin/settings",
+    title: "System Settings",
+    description: "System configuration tools are currently under development."
+  }
+];
 
 const router = createHashRouter([
   {
@@ -26,40 +45,14 @@ const router = createHashRouter([
         path: "/admin/branches",
         element: <BranchManagement />,
       },
-      {
-        path: "/admin/analytics",
-        element: (
-          <Placeholder
-            title="Analytics Dashboard"
-            description="This module is currently under development and will be available in an upcoming release."
-            useAdminLayout
-          />
-        ),
-      },
-      {
-        path: "/admin/audit",
-        element: (
-          <Placeholder
-            title="Audit Logs"
-            description="Administrative activity tracking will be available in an upcoming release."
-            useAdminLayout
-          />
-        ),
-      },
-      {
-        path: "/admin/settings",
-        element: (
-          <Placeholder
-            title="System Settings"
-            description="System configuration tools are currently under development."
-            useAdminLayout
-          />
-        ),
-      },
+      ...adminPlaceholderRoutes.map(({ path, title, description }) => ({
+        path,
+        element: <Placeholder title={title} description={description} useAdminLayout />
+      }))
     ],
   },
   {
-    element: <ProtectedRoute />, // Any authenticated user
+    element: <ProtectedRoute />, 
     children: [
       {
         path: "/placeholder",
@@ -69,7 +62,7 @@ const router = createHashRouter([
   },
   {
     path: "*",
-    element: <Placeholder />,
+    element: <NotFound />,
   }
 ]);
 

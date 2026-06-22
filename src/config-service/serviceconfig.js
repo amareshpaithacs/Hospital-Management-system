@@ -1,12 +1,8 @@
-import { MOCK_USERS } from "./authConfig";
-
-const SESSION_KEY = "hms_user_session";
+import { MOCK_USERS } from "./mockData";
+import { AUTH_CONFIG } from "./authConfig";
 
 export const authService = {
-  /**
-   * Temporary mock login logic.
-   * Replaces this with a real API call (e.g., fetch POST /api/auth/login) in the future.
-   */
+  /*Replaces this with a real API call */
   login: async ({ email, password, role, branch }) => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -17,33 +13,31 @@ export const authService = {
             u.role === role &&
             u.branch === branch
         );
-
         if (user) {
           const sessionData = {
+            id: user.id,
+            displayName: user.displayName,
             email: user.email,
             role: user.role,
             selectedBranch: user.branch,
-            // In a real app, store the JWT token here instead of plain user details
           };
-          localStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
+          localStorage.setItem(AUTH_CONFIG.SESSION_KEY, JSON.stringify(sessionData));
           resolve({ success: true, user: sessionData });
         } else {
           reject({ success: false, message: "Invalid credentials or role/branch mismatch" });
         }
-      }, 800);
+      }, AUTH_CONFIG.MOCK_DELAY_MS);
     });
   },
 
   logout: () => {
-    localStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem(AUTH_CONFIG.SESSION_KEY);
   },
-
   getCurrentUser: () => {
-    const data = localStorage.getItem(SESSION_KEY);
+    const data = localStorage.getItem(AUTH_CONFIG.SESSION_KEY);
     return data ? JSON.parse(data) : null;
   },
-
   isAuthenticated: () => {
-    return !!localStorage.getItem(SESSION_KEY);
+    return !!localStorage.getItem(AUTH_CONFIG.SESSION_KEY);
   },
 };

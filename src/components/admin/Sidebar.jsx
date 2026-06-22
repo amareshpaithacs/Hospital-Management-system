@@ -5,7 +5,6 @@ import { useAuth } from "../../config-service/AuthContext";
 function Sidebar({ isOpen, onClose }) {
   const navigate = useNavigate();
   const { logout } = useAuth();
-
   const handleLogout = () => {
     logout();
     navigate("/", { replace: true });
@@ -24,7 +23,6 @@ function Sidebar({ isOpen, onClose }) {
           <BsXLg size={20} />
         </button>
       </div>
-
       <nav className="sidebar-nav">
         <NavLink to="/admin/dashboard" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
           <BsGrid1X2 className="nav-icon" />
@@ -51,7 +49,6 @@ function Sidebar({ isOpen, onClose }) {
           <span>System Settings</span>
         </NavLink>
       </nav>
-
       <div className="sidebar-footer">
         <div className="sidebar-user-profile">
           <div className="sidebar-avatar">

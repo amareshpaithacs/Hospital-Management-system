@@ -96,7 +96,6 @@ export function getUsers() {
   }
   return SEED_USERS;
 }
-
 export function saveUsers(users) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
@@ -104,7 +103,6 @@ export function saveUsers(users) {
     console.error('[Storage] Failed to save users to localStorage:', err);
   }
 }
-
 export function generateUserId(role, existingUsers) {
   const prefixMap = {
     Doctor: "DOC",
