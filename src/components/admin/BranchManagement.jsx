@@ -12,7 +12,6 @@ const DEPARTMENT_LIST = [
 ];
 
 const RESOURCE_LIST = ["Pharmacy", "Laboratory", "ICU"];
-
 const STATUS_CLASS_MAP = {
   [BRANCH_STATUS.OPERATIONAL]: "status-pill-active",
   [BRANCH_STATUS.MAINTENANCE]: "status-pill-warning",

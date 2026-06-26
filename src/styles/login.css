@@ -13,7 +13,7 @@
   width: 100%;
   max-width: 1158px;
   min-height: 816px;
-  background: linear-gradient(160deg, var(--color-sidebar-active) 0%, var(--color-white) 50%, #f0fdfa 100%);
+  background: linear-gradient(160deg, var(--color-sidebar-active), var(--color-white), #f0fdfa);
   border-radius: var(--radius-card);
   padding-right: 32px;
   align-items: center;
